@@ -10,14 +10,30 @@ db = client['moneda']
 def createModel(numInputs):
     # Configuración de la red
     model = tf.keras.Sequential([
-        tf.keras.Input(shape=(numInputs,)),# numero de entradas
-        tf.keras.layers.Dense(256,  activation='relu'), 
-        tf.keras.layers.Dense(128, activation='relu'),  
-        tf.keras.layers.Dense(1, activation='linear')  
+        tf.keras.Input(shape=(22050,)),# numero de entradas
+        tf.keras.layers.Dense(64,  activation='relu'), 
+        tf.keras.layers.Dense(32, activation='sigmoid'),  
+        tf.keras.layers.Dense(32, activation='relu'),  
+        tf.keras.layers.Dense(1, activation='relu')  
     ])
     model.compile(optimizer=tf.keras.optimizers.Adam(0.01), loss='mean_squared_error')
     return model
-
+def createInputs():
+    coleccion_outputs = db['outputs']
+    documents = [
+    {'outputs': 2},
+    {'outputs': 2},
+    {'outputs': 2},
+    {'outputs': 2},
+    {'outputs': 2},
+    {'outputs': 1},
+    {'outputs': 1},
+    {'outputs': 1},
+    {'outputs': 1},
+    {'outputs': 1},
+    {'outputs': 1},]
+    coleccion_outputs.insert_many(documents)
+    
 def normalize(inputs):
     normalized_inputs = []
     for sublist in inputs:
@@ -34,40 +50,33 @@ def saveInputs(inputs):
     resultado = collection.insert_one(documento)
     print(f'Documento insertado con el id: {resultado.inserted_id}')
     
+def getInputs():
+    coleccion = db['monedas']
+    outputs=db['outputs']
+    
+    # Obtener solo los valores de _id de cada documento
+    ids = [document['pattern'] for document in coleccion.find()]
+    out=[doc['outputs'] for doc in outputs.find()]
+    return list(ids),list(out)
+
+
 def training(inputs,outputs,numPatterns):
-    datos = pd.read_excel("logic/data/500.xlsx")
-    x = datos.filter(like='Hz') 
-    y = datos.filter(like='Moneda')
-    datosx = np.array(x, dtype=float)
-    datosy = np.array(y, dtype=float)
-    inputsNormalize = normalize(datosx)
-    patrones=[[6286.05] * 132300]
     model=createModel(numPatterns)
-    model.fit(np.array(normalize(inputs)), np.array(outputs), epochs=1000, verbose=False)
-    # Datos de prueba
-    X2 = np.array(normalize(patrones), dtype=float)
-    # # x2Normalizado=[num / max(X2) for num in X2]
-
-    predictions = model.predict(X2)
-    print("prediciones",predictions)
-
-   
+    model.fit(np.array(inputs), np.array(outputs), epochs=1000, verbose=False)
     try:
         model.summary()
-        model.save("logic/models/3segundos.keras")#guardar modelo
+        model.save("prueba2.keras")#guardar modelo
         print("Modelo guardado correctamente")
-    except:
-        print("No se guardo el modelo")
+    except Exception as e:
+        print("Error al guardar el modelo:", e)
 
-def deleteOne():
-    result = collection.delete_one(filtro)
-
-def simulation():
-    model= tf.keras.models.load_model("logic/models/3segundos.keras")#importar modelo entrenado
+def simulation(output):
+    print("tamañooo",len(output))
+    model= tf.keras.models.load_model("prueba2.keras")#importar modelo entrenado
     print("Simulacion")
     model.summary()
-    x = pd.read_excel("logic/data/500.xlsx").filter(like="Hz")
-    X2 = np.array([[6286.05] * 132300], dtype=float)#pasar por parametro esto
+    # x = pd.read_excel("logic/data/500.xlsx").filter(like="Hz")
+    X2 = np.array([output],dtype=float)#pasar por parametro esto
     # x2Normalizado=[num / max(np.array(x,dtype=float)) for num in X2]
     predictions=model.predict(X2)
     print("prediction",predictions)
