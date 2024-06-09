@@ -25,7 +25,7 @@ def reduce_audio(audio_data_mono, fs, freq):
 
     # Calcular el índice correspondiente a un segundo después del pico
     samples_per_second = fs
-    one_second_after_peak_index = int(peak_index + samples_per_second)
+    one_second_after_peak_index = int(peak_index + samples_per_second / 2)
 
     # Cortar el audio desde el primer pico hasta un segundo después de ese pico
     reduced_audio = audio_data_mono[peak_index:one_second_after_peak_index]

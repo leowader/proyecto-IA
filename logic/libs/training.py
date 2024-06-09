@@ -11,27 +11,27 @@ def createModel(numInputs):
     # Configuración de la red
     model = tf.keras.Sequential([
         tf.keras.Input(shape=(22050,)),# numero de entradas
-        tf.keras.layers.Dense(64,  activation='relu'), 
-        tf.keras.layers.Dense(32, activation='sigmoid'),  
-        tf.keras.layers.Dense(32, activation='relu'),  
+        tf.keras.layers.Dense(32,  activation='relu'), 
+        tf.keras.layers.Dense(164, activation='relu'),  
+        tf.keras.layers.Dense(132, activation='sigmoid'),  
         tf.keras.layers.Dense(1, activation='relu')  
     ])
-    model.compile(optimizer=tf.keras.optimizers.Adam(0.01), loss='mean_squared_error')
+    model.compile(optimizer=tf.keras.optimizers.Adam(0.001), loss='mean_squared_error', metrics=['accuracy'])
     return model
 def createInputs():
     coleccion_outputs = db['outputs']
     documents = [
-    {'outputs': 2},
-    {'outputs': 2},
-    {'outputs': 2},
-    {'outputs': 2},
-    {'outputs': 2},
+    {'outputs': 0}, #   0   =   200 pesos
+    {'outputs': 0},
+    {'outputs': 0},
+    {'outputs': 0},
+    {'outputs': 0},
     {'outputs': 1},
     {'outputs': 1},
     {'outputs': 1},
     {'outputs': 1},
-    {'outputs': 1},
-    {'outputs': 1},]
+    {'outputs': 1},#    1   =   1000 pesos
+    {'outputs': 1}]
     coleccion_outputs.insert_many(documents)
     
 def normalize(inputs):
@@ -45,7 +45,7 @@ def normalize(inputs):
 def saveInputs(inputs): 
     collection = db['monedas']
     documento = {
-    'pattern': inputs,
+    'pattern': inputs
     }
     resultado = collection.insert_one(documento)
     print(f'Documento insertado con el id: {resultado.inserted_id}')
@@ -61,8 +61,10 @@ def getInputs():
 
 
 def training(inputs,outputs,numPatterns):
+    inputs = normalize(np.array(inputs))
+    outputs = np.array(outputs).reshape(-1, 1)
     model=createModel(numPatterns)
-    model.fit(np.array(inputs), np.array(outputs), epochs=1000, verbose=False)
+    model.fit(np.array(inputs), np.array(outputs), epochs=100,validation_split=0.2, verbose=True)
     try:
         model.summary()
         model.save("prueba2.keras")#guardar modelo
@@ -79,6 +81,8 @@ def simulation(output):
     X2 = np.array([output],dtype=float)#pasar por parametro esto
     # x2Normalizado=[num / max(np.array(x,dtype=float)) for num in X2]
     predictions=model.predict(X2)
+    
     print("prediction",predictions)
     return predictions
 # training([[6286.05] * 132300],[[1]],132300)
+createInputs()
