@@ -33,7 +33,7 @@ def reduce_audio(audio_data_mono, fs, freq):
     write("reduced_output.wav", fs, reduced_audio.astype(np.int16))
     print("tamaño vector reducido",len(reduced_audio))
     print("Audio reducido guardado como 'reduced_output.wav'")
-      # saveInputs(inputs= np.array(audio_data_mono).tolist())
+    saveInputs(inputs= np.array(reduced_audio).tolist())
 def toggle_recording():
     global is_recording, recording_thread
 
@@ -49,7 +49,7 @@ def toggle_recording():
 
 def record_audio():
     global is_recording, filename_wav
-    fs = 44100  # Frecuencia de muestreo
+    fs = 22050  # Frecuencia de muestreo
     duration = 5  # Duración máxima (segundos)
 
     # Grabar audio
