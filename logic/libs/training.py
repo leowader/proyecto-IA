@@ -26,6 +26,17 @@ def createInputs():
     {'outputs': 0},
     {'outputs': 0},
     {'outputs': 0},
+    {'outputs': 0}, #   0   =   200 pesos
+    {'outputs': 0},
+    {'outputs': 0},
+    {'outputs': 0},
+    {'outputs': 0},
+    {'outputs': 1},
+    {'outputs': 1},
+    {'outputs': 1},
+    {'outputs': 1},
+    {'outputs': 1},#    1   =   1000 pesos
+    {'outputs': 1},
     {'outputs': 1},
     {'outputs': 1},
     {'outputs': 1},
@@ -85,4 +96,4 @@ def simulation(output):
     print("prediction",predictions)
     return predictions
 # training([[6286.05] * 132300],[[1]],132300)
-createInputs()
+# createInputs()
