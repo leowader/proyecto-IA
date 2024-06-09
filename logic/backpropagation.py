@@ -6,5 +6,5 @@ entradas,out=getInputs()
 print("salidas",out)
 # training(inputs=entradas,outputs=out,numPatterns=len(entradas))
 
-# if (len(entradas[0])==22050):
-#     simulation(output=entradas[4])
+if (len(entradas[0])==11025):
+    simulation(output=entradas[16])

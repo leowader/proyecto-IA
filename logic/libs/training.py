@@ -10,11 +10,11 @@ db = client['moneda']
 def createModel(numInputs):
     # Configuración de la red
     model = tf.keras.Sequential([
-        tf.keras.Input(shape=(22050,)),# numero de entradas
-        tf.keras.layers.Dense(32,  activation='relu'), 
+        tf.keras.Input(shape=(11025,)),# numero de entradas
+        tf.keras.layers.Dense(32,  activation='linear'), 
         tf.keras.layers.Dense(164, activation='relu'),  
-        tf.keras.layers.Dense(132, activation='sigmoid'),  
-        tf.keras.layers.Dense(1, activation='relu')  
+        tf.keras.layers.Dense(132, activation='linear'),  
+        tf.keras.layers.Dense(1, activation='linear')  
     ])
     model.compile(optimizer=tf.keras.optimizers.Adam(0.001), loss='mean_squared_error', metrics=['accuracy'])
     return model
@@ -75,7 +75,7 @@ def training(inputs,outputs,numPatterns):
     inputs = normalize(np.array(inputs))
     outputs = np.array(outputs).reshape(-1, 1)
     model=createModel(numPatterns)
-    model.fit(np.array(inputs), np.array(outputs), epochs=100,validation_split=0.2, verbose=True)
+    model.fit(np.array(inputs), np.array(outputs), epochs=1000,validation_split=0.2, verbose=True)
     try:
         model.summary()
         model.save("prueba2.keras")#guardar modelo
