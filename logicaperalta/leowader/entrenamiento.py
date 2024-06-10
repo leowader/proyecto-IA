@@ -103,7 +103,7 @@ def main():
     modelo = construir_modelo(input_shape, rate=TASA_APRENDIZAJE)
 
     # Entrenar red
-    entrenamiento(modelo, EPOCAS, TASA_APRENDIZAJE, CARPETAS, X_entrenamiento, y_entrenamiento, X_validacion, y_validacion)
+    entrenamiento(modelo, EPOCAS, BATCH_SIZE, CARPETAS, X_entrenamiento, y_entrenamiento, X_validacion, y_validacion)
 
     # Guardar modelo
     modelo.save(GUARDAR_MODELO)
