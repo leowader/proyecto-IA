@@ -73,8 +73,8 @@ ventaMain = Tk()
 ventaMain.geometry('300x200')
 ventaMain.configure(bg='beige')
 
-ventaMain.title('TALLER RNA')
-lblTitulo = Label(ventaMain, text="Grabar Nota Musical")
+ventaMain.title('RECONOCIMIENTO DE MONEDAS')
+lblTitulo = Label(ventaMain, text="Grabar caida moneda")
 
 lblTitulo.place(relx=0.3, rely=0.1)
 boton = Button(ventaMain, text="Grabar Audio", command=lambda: verificarSonido(), width=15, height=2)
@@ -125,7 +125,7 @@ def verificarSonido():
     resultado = detectarNota.predecir("audio.wav")
     print(resultado)
 
-    lblResultado = Label(ventaMain, text="La nota musical es: " + resultado)
+    lblResultado = Label(ventaMain, text="La moneda  es: " + resultado)
     lblResultado.place(relx=0.25, rely=0.7)
 
 def PaginaPrincipal():
