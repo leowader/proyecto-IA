@@ -1,10 +1,10 @@
 import librosa as libro
-import tensorflow.keras as tf
+import tensorflow as tf
 import numpy as np
 from tkinter import *
 import pyaudio
 import wave
-
+import librosa
 RUTA_MODELO = "modelook.h5"
 MUESTRAS = 22050  # Considera audios superiores a 1 segs
 
@@ -12,54 +12,55 @@ class _Detectar_nota:
 
     modelo = None  # inicializamos el modelo como tipo none
     array_notas = [
-        "100",
         "200",
+        "500",
+        "1000",
     ]
     instancia = None
     
-def predecir(self, ruta_archivo):
-    # ruta del archivo de audio para predecir
-    # palabra clave predicha por el modelo
+    def predecir(self, ruta_archivo):
+        # ruta del archivo de audio para predecir
+        # palabra clave predicha por el modelo
 
-    # extraer MFCC
-    MFCCs = self.pre_procesado(ruta_archivo)
+        # extraer MFCC
+        MFCCs = self.pre_procesado(ruta_archivo)
 
-    # necesitamos una matriz de 4 dim para alimentar el modelo para la predicción:
-    # (muestras, pasos de tiempo, coeficientes, 1)
-    MFCCs = MFCCs[np.newaxis, ..., np.newaxis]
+        # necesitamos una matriz de 4 dim para alimentar el modelo para la predicción:
+        # (muestras, pasos de tiempo, coeficientes, 1)
+        MFCCs = MFCCs[np.newaxis, ..., np.newaxis]
 
-    # obtener la prediccion prevista
-    predicciones = self.modelo.predict(MFCCs)
-    indice_predecir = np.argmax(predicciones)
-    palabra_predecir = self.array_notas[indice_predecir]
-    return palabra_predecir
-import librosa
+        # obtener la prediccion prevista
+        predicciones = self.modelo.predict(MFCCs)
+        indice_predecir = np.argmax(predicciones)
+        palabra_predecir = self.array_notas[indice_predecir]
+        return palabra_predecir
 
-def pre_procesado(self, ruta_archivo, num_mfcc=13, n_fft=2848, hop_length=512):
-    """
-    Extrae los MFCCs del archivo de audio especificado.
 
-    Parámetros:
-        ruta_archivo (str): Ruta del archivo de audio.
-        num_mfcc (int): Número de coeficientes MFCC a extraer.
-        n_fft (int): Tamaño de la ventana de análisis.
-        hop_length (int): Tamaño del salto entre ventanas.
+    def pre_procesado(self, ruta_archivo, num_mfcc=13, n_fft=2048, hop_length=512):
+        """
+        Extrae los MFCCs del archivo de audio especificado.
 
-    Retorno:
-        numpy.ndarray: Matriz de datos MFCC.
-    """
+        Parámetros:
+            ruta_archivo (str): Ruta del archivo de audio.
+            num_mfcc (int): Número de coeficientes MFCC a extraer.
+            n_fft (int): Tamaño de la ventana de análisis.
+            hop_length (int): Tamaño del salto entre ventanas.
 
-    # Extraer los MFCCs del archivo de audio
-    senal, frecuencia_muestreo = librosa.load(ruta_archivo)
+        Retorno:
+            numpy.ndarray: Matriz de datos MFCC.
+        """
+        # Extraer los MFCCs del archivo de audio
+        senal, frecuencia_muestreo = librosa.load(ruta_archivo, sr=None)
 
-    # Asegurar la consistencia de la longitud de la señal
-    if len(senal) > MUESTRAS:
-        senal = senal[:MUESTRAS]
+        # Asegurar la consistencia de la longitud de la señal
+        if len(senal) > MUESTRAS:
+            senal = senal[:MUESTRAS]
 
-    # Extraer MFCCs
-    mfccs = librosa.feature.mfcc(senal, sr=frecuencia_muestreo, n_mfcc=num_mfcc, n_fft=n_fft, hop_length=hop_length)
+        # Extraer MFCCs
+        mfccs = librosa.feature.mfcc(y=senal, sr=frecuencia_muestreo, n_mfcc=num_mfcc, n_fft=n_fft, hop_length=hop_length)
 
-    return mfccs.T
+        return mfccs.T
+
 def detectar_nota():
     # verificar que se crea una instancia solo la primera vez que se llama a la función
     if _Detectar_nota.instancia is None:
@@ -87,7 +88,7 @@ def verificarSonido():
     CHANNELS=1
     RATE=44100
     CHUNK=1024
-    duracion=2
+    duracion=3
     archivo="audio.wav"
 
     # INICIAMOS "pyaudio"
