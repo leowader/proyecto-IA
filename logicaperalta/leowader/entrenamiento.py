@@ -8,7 +8,7 @@ RUTA_DATASET = "./datasetudio.json"
 GUARDAR_MODELO = "modelook.h5"
 EPOCAS = 1000
 BATCH_SIZE = 32 # vaya dando una respuesta entre cada epoca
-CARPETAS = 2
+CARPETAS = 20
 TASA_APRENDIZAJE = 0.0001
 
 def cargar_dataset(ruta_datos):
@@ -36,63 +36,53 @@ def prepararDataset(ruta_datos,test_size =0.1,tam_validacion=0.1):
     
     return X_entrenamiento,Y_entrenamiento,X_validacion,Y_validacion,X_prueba,Y_prueba
 
-def construir_modelo(input_shape,loss='sparse_categorical_crossentropy',rate = 0.0001):
+def construir_modelo(input_shape, loss='sparse_categorical_crossentropy', rate=0.0001):
     modelo = tf.keras.models.Sequential()
-    # 1nd capa de conv
-    modelo.add(tf.keras.layers.Conv2D(64, (3, 3), activation='relu',
-                            input_shape=input_shape,
-                            kernel_regularizer=tf.keras.regularizers.l2(0.001)))
+    
+    # 1ra capa de conv
+    modelo.add(tf.keras.layers.Conv2D(50, (3, 3), activation='relu',
+                                      input_shape=input_shape,
+                                      kernel_regularizer=tf.keras.regularizers.l2(0.01)))
     modelo.add(tf.keras.layers.BatchNormalization())
     modelo.add(tf.keras.layers.MaxPooling2D((3, 3), strides=(2, 2), padding='same'))
+    modelo.add(tf.keras.layers.Dropout(0.6))  # Aumentada la tasa de Dropout
 
-    # 2nd capa de conv
-    modelo.add(tf.keras.layers.Conv2D(32, (2, 2), activation='relu',
-                            kernel_regularizer=tf.keras.regularizers.l2(0.001)))
+    # 2da capa de conv
+    modelo.add(tf.keras.layers.Conv2D(128, (3, 3), activation='relu',
+                                      kernel_regularizer=tf.keras.regularizers.l2(0.01)))
     modelo.add(tf.keras.layers.BatchNormalization())
-    modelo.add(tf.keras.layers.MaxPooling2D((2, 2), strides=(2, 2), padding='same'))
+    modelo.add(tf.keras.layers.MaxPooling2D((3, 3), strides=(2, 2), padding='same'))
+    modelo.add(tf.keras.layers.Dropout(0.6))  # Aumentada la tasa de Dropout
 
-    # 3nd capa de conv
-    modelo.add(tf.keras.layers.Conv2D(32, (2, 2), activation='relu',
-                            kernel_regularizer=tf.keras.regularizers.l2(0.001)))
-    modelo.add(tf.keras.layers.BatchNormalization())
-    modelo.add(tf.keras.layers.MaxPooling2D((2, 2), strides=(2, 2), padding='same'))
-    # Aplanar la salida y alimentarla en una capa densa
+    # Aplanar y capas densas
     modelo.add(tf.keras.layers.Flatten())
-    modelo.add(tf.keras.layers.Dense(64, activation='relu'))
-    tf.keras.layers.Dropout(0.3)
+    modelo.add(tf.keras.layers.Dense(32, activation='relu', kernel_regularizer=tf.keras.regularizers.l2(0.01)))
+    modelo.add(tf.keras.layers.Dropout(0.6))  # Aumentada la tasa de Dropout
 
-    # capa de salida softmax
+    # Capa de salida
     modelo.add(tf.keras.layers.Dense(5, activation='softmax'))
 
-    optimiser = tf.keras.optimizers.Adam(learning_rate=rate)
+    optimizador = tf.keras.optimizers.Adam(learning_rate=rate)
 
     # Compilar modelo
-    modelo.compile(optimizer=optimiser,
-               loss=loss,
-               metrics=['accuracy'])
+    modelo.compile(optimizer=optimizador,
+                   loss=loss,
+                   metrics=['accuracy'])
 
-    # imprimir parámetros del modelo en la consola
+    # Imprimir resumen del modelo
     modelo.summary()
 
     return modelo
 
 def entrenamiento(modelo, epochs, batch_size, patience, X_train, y_train, X_validation, y_validation):
-    # Modelo de entrenamiento
-    # Número de épocas de entrenamiento
-    # Muestras por lote
-    # Num épocas para esperar antes de la parada anticipada, si no hay una mejora en la precisión
-    # Entradas para el conjunto de entrenamiento
-    # Objetivos para el entrenamiento
-    # Entradas para el conjunto de validación
-    # Objetivos para el conjunto de validación
-    
-    earlystop_callback = tf.keras.callbacks.EarlyStopping(monitor="accuracy", min_delta=0.001, patience=patience)
+    earlystop_callback = tf.keras.callbacks.EarlyStopping(monitor="val_loss", min_delta=0.001, patience=patience)
 
-    # Modelo de entrenamiento
+    # Entrenar modelo
     modelo.fit(X_train, y_train, epochs=epochs, batch_size=batch_size, validation_data=(X_validation, y_validation),
                callbacks=[earlystop_callback])
     
     return modelo
+
 
 def main():
     # generar conjuntos de entrenamiento, validación y prueba
