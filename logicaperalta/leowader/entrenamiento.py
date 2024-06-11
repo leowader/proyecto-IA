@@ -36,53 +36,55 @@ def prepararDataset(ruta_datos,test_size =0.1,tam_validacion=0.1):
     
     return X_entrenamiento,Y_entrenamiento,X_validacion,Y_validacion,X_prueba,Y_prueba
 
-def construir_modelo(input_shape, loss='sparse_categorical_crossentropy', rate=0.0001):
+def construir_modelo(input_shape,loss='sparse_categorical_crossentropy',rate = 0.0001):
     modelo = tf.keras.models.Sequential()
-    
-    # 1ra capa de conv
-    modelo.add(tf.keras.layers.Conv2D(50, (3, 3), activation='relu',
-                                      input_shape=input_shape,
-                                      kernel_regularizer=tf.keras.regularizers.l2(0.01)))
+    # 1nd capa de conv
+    modelo.add(tf.keras.layers.Conv2D(32, (3, 3), activation='relu',
+                            input_shape=input_shape,
+                            kernel_regularizer=tf.keras.regularizers.l2(0.001)))
     modelo.add(tf.keras.layers.BatchNormalization())
     modelo.add(tf.keras.layers.MaxPooling2D((3, 3), strides=(2, 2), padding='same'))
-    modelo.add(tf.keras.layers.Dropout(0.6))  # Aumentada la tasa de Dropout
 
-    # 2da capa de conv
-    modelo.add(tf.keras.layers.Conv2D(128, (3, 3), activation='relu',
-                                      kernel_regularizer=tf.keras.regularizers.l2(0.01)))
+    # 2nd capa de conv
+    modelo.add(tf.keras.layers.Conv2D(64, (2, 2), activation='sigmoid',
+                            kernel_regularizer=tf.keras.regularizers.l2(0.001)))
     modelo.add(tf.keras.layers.BatchNormalization())
-    modelo.add(tf.keras.layers.MaxPooling2D((3, 3), strides=(2, 2), padding='same'))
-    modelo.add(tf.keras.layers.Dropout(0.6))  # Aumentada la tasa de Dropout
+    modelo.add(tf.keras.layers.MaxPooling2D((2, 2), strides=(2, 2), padding='same'))
 
-    # Aplanar y capas densas
+    # 3nd capa de conv
+    modelo.add(tf.keras.layers.Conv2D(32, (2, 2), activation='linear',
+                            kernel_regularizer=tf.keras.regularizers.l2(0.001)))
+    modelo.add(tf.keras.layers.BatchNormalization())
+    modelo.add(tf.keras.layers.MaxPooling2D((2, 2), strides=(2, 2), padding='same'))
+    # Aplanar la salida y alimentarla en una capa densa
     modelo.add(tf.keras.layers.Flatten())
-    modelo.add(tf.keras.layers.Dense(32, activation='relu', kernel_regularizer=tf.keras.regularizers.l2(0.01)))
-    modelo.add(tf.keras.layers.Dropout(0.6))  # Aumentada la tasa de Dropout
+    modelo.add(tf.keras.layers.Dense(64, activation='relu'))
+    tf.keras.layers.Dropout(0.5)
 
-    # Capa de salida
+    # capa de salida softmax
     modelo.add(tf.keras.layers.Dense(5, activation='softmax'))
 
-    optimizador = tf.keras.optimizers.Adam(learning_rate=rate)
+    optimiser = tf.keras.optimizers.Adam(learning_rate=rate)
 
     # Compilar modelo
-    modelo.compile(optimizer=optimizador,
-                   loss=loss,
-                   metrics=['accuracy'])
+    modelo.compile(optimizer=optimiser,
+               loss=loss,
+               metrics=['accuracy'])
 
-    # Imprimir resumen del modelo
+    # imprimir parámetros del modelo en la consola
     modelo.summary()
 
     return modelo
 
 def entrenamiento(modelo, epochs, batch_size, patience, X_train, y_train, X_validation, y_validation):
-    earlystop_callback = tf.keras.callbacks.EarlyStopping(monitor="val_loss", min_delta=0.001, patience=patience)
+   
+    earlystop_callback = tf.keras.callbacks.EarlyStopping(monitor="accuracy", min_delta=0.001, patience=patience)
 
-    # Entrenar modelo
+    # Modelo de entrenamiento
     modelo.fit(X_train, y_train, epochs=epochs, batch_size=batch_size, validation_data=(X_validation, y_validation),
                callbacks=[earlystop_callback])
     
     return modelo
-
 
 def main():
     # generar conjuntos de entrenamiento, validación y prueba
@@ -99,4 +101,4 @@ def main():
     modelo.save(GUARDAR_MODELO)
     
 if __name__ == "__main__":
-    main()   
+    main()
