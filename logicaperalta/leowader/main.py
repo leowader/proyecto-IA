@@ -12,9 +12,9 @@ class _Detectar_nota:
 
     modelo = None  # inicializamos el modelo como tipo none
     array_notas = [
+        "1000",
         "200",
         "500",
-        "1000",
     ]
     instancia = None
     
@@ -123,7 +123,7 @@ def verificarSonido():
     assert detectarNota is detectarNota1
 
     # Hacer una predicción
-    resultado = detectarNota.predecir("audio.wav")
+    resultado = detectarNota.predecir("./Sonidos/200/Grabación (50).wav")
     print(resultado)
 
     lblResultado = Label(ventaMain, text="La moneda  es: " + resultado)
