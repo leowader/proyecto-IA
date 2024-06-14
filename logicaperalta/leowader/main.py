@@ -6,8 +6,7 @@ from PIL import Image, ImageTk
 import pyaudio
 import wave
 import librosa
-
-RUTA_MODELO = "modelook4.h5"
+RUTA_MODELO = "entrenamiento.h5"
 MUESTRAS = 22050  # Considera audios superiores a 1 segs
 
 class _Detectar_nota:
