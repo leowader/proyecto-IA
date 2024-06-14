@@ -5,7 +5,7 @@ from sklearn.model_selection import train_test_split
 
 
 RUTA_DATASET = "./datasetudio.json"
-GUARDAR_MODELO = "modelook3.h5"
+GUARDAR_MODELO = "entrenamiento.h5"
 EPOCAS = 1000
 BATCH_SIZE = 32 # vaya dando una respuesta entre cada epoca
 CARPETAS = 20
@@ -62,7 +62,7 @@ def construir_modelo(input_shape,loss='sparse_categorical_crossentropy',rate = 0
     tf.keras.layers.Dropout(0.5)
 
     # capa de salida softmax
-    modelo.add(tf.keras.layers.Dense(5, activation='softmax'))
+    modelo.add(tf.keras.layers.Dense(3, activation='softmax'))
 
     optimiser = tf.keras.optimizers.Adam(learning_rate=rate)
 
