@@ -5,7 +5,7 @@ from sklearn.model_selection import train_test_split
 
 
 RUTA_DATASET = "./datasetudio.json"
-GUARDAR_MODELO = "modelook1.h5"
+GUARDAR_MODELO = "modelook3.h5"
 EPOCAS = 1000
 BATCH_SIZE = 32 # vaya dando una respuesta entre cada epoca
 CARPETAS = 20
