@@ -5,11 +5,11 @@ from sklearn.model_selection import train_test_split
 
 
 RUTA_DATASET = "./datasetudio.json"
-GUARDAR_MODELO = "modelook.h5"
+GUARDAR_MODELO = "modelook1.h5"
 EPOCAS = 1000
 BATCH_SIZE = 32 # vaya dando una respuesta entre cada epoca
 CARPETAS = 20
-TASA_APRENDIZAJE = 0.0001
+TASA_APRENDIZAJE = 0.001
 
 def cargar_dataset(ruta_datos):
     print(ruta_datos)
@@ -46,20 +46,20 @@ def construir_modelo(input_shape,loss='sparse_categorical_crossentropy',rate = 0
     modelo.add(tf.keras.layers.MaxPooling2D((3, 3), strides=(2, 2), padding='same'))
 
     # 2nd capa de conv
-    modelo.add(tf.keras.layers.Conv2D(64, (2, 2), activation='relu',
+    modelo.add(tf.keras.layers.Conv2D(64, (2, 2), activation='sigmoid',
                             kernel_regularizer=tf.keras.regularizers.l2(0.001)))
     modelo.add(tf.keras.layers.BatchNormalization())
     modelo.add(tf.keras.layers.MaxPooling2D((2, 2), strides=(2, 2), padding='same'))
 
     # 3nd capa de conv
-    modelo.add(tf.keras.layers.Conv2D(32, (2, 2), activation='relu',
+    modelo.add(tf.keras.layers.Conv2D(32, (2, 2), activation='linear',
                             kernel_regularizer=tf.keras.regularizers.l2(0.001)))
     modelo.add(tf.keras.layers.BatchNormalization())
     modelo.add(tf.keras.layers.MaxPooling2D((2, 2), strides=(2, 2), padding='same'))
     # Aplanar la salida y alimentarla en una capa densa
     modelo.add(tf.keras.layers.Flatten())
     modelo.add(tf.keras.layers.Dense(128, activation='relu'))
-    tf.keras.layers.Dropout(0.4)
+    tf.keras.layers.Dropout(0.5)
 
     # capa de salida softmax
     modelo.add(tf.keras.layers.Dense(5, activation='softmax'))
