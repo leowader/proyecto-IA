@@ -2,9 +2,11 @@ import librosa as libro
 import tensorflow as tf
 import numpy as np
 from tkinter import *
+from PIL import Image, ImageTk
 import pyaudio
 import wave
 import librosa
+
 RUTA_MODELO = "modelook4.h5"
 MUESTRAS = 22050  # Considera audios superiores a 1 segs
 
@@ -34,7 +36,6 @@ class _Detectar_nota:
         indice_predecir = np.argmax(predicciones)
         palabra_predecir = self.array_notas[indice_predecir]
         return palabra_predecir
-
 
     def pre_procesado(self, ruta_archivo, num_mfcc=13, n_fft=2048, hop_length=512):
         """
@@ -68,38 +69,24 @@ def detectar_nota():
         _Detectar_nota.modelo = tf.keras.models.load_model(RUTA_MODELO)
 
     return _Detectar_nota.instancia
-#Ventana Principal
-ventaMain = Tk()
-
-ventaMain.geometry('300x200')
-ventaMain.configure(bg='beige')
-
-ventaMain.title('RECONOCIMIENTO DE MONEDAS')
-lblTitulo = Label(ventaMain, text="Grabar caida moneda")
-
-lblTitulo.place(relx=0.3, rely=0.1)
-boton = Button(ventaMain, text="Grabar Audio", command=lambda: verificarSonido(), width=15, height=2)
-
-boton.place(relx=0.3, rely=0.3)
-boton.config(bg="#2354E2")
 
 def verificarSonido():
-    FORMAT=pyaudio.paInt16
-    CHANNELS=1
-    RATE=44100
-    CHUNK=1024
-    duracion=3
-    archivo="audio.wav"
+    FORMAT = pyaudio.paInt16
+    CHANNELS = 1
+    RATE = 44100
+    CHUNK = 1024
+    duracion = 3
+    archivo = "audio.wav"
 
     # INICIAMOS "pyaudio"
-    audio=pyaudio.PyAudio()
-    stream=audio.open(format=FORMAT, channels=CHANNELS, rate=RATE, input=True, frames_per_buffer=CHUNK)
+    audio = pyaudio.PyAudio()
+    stream = audio.open(format=FORMAT, channels=CHANNELS, rate=RATE, input=True, frames_per_buffer=CHUNK)
 
     # INICIAMOS GRABACION
     print("grabando....")
-    frames=[]
+    frames = []
     for i in range(0, int(RATE / CHUNK * duracion)):
-        data=stream.read(CHUNK)
+        data = stream.read(CHUNK)
         frames.append(data)
     print("grabacion terminada")
 
@@ -107,6 +94,7 @@ def verificarSonido():
     stream.stop_stream()
     stream.close()
     audio.terminate()
+
     # CREAMOS Y GUARDAMOS EL ARCHIVO DE AUDIO
     waveFile = wave.open(archivo, 'wb')
     waveFile.setnchannels(CHANNELS)
@@ -115,7 +103,7 @@ def verificarSonido():
     waveFile.writeframes(b''.join(frames))
     waveFile.close()
 
-    # 
+    # Detectar la nota
     detectarNota = detectar_nota()
     detectarNota1 = detectar_nota()
 
@@ -126,8 +114,42 @@ def verificarSonido():
     resultado = detectarNota.predecir("audio.wav")
     print(resultado)
 
-    lblResultado = Label(ventaMain, text="La moneda  es: " + resultado)
-    lblResultado.place(relx=0.25, rely=0.7)
+    # Mostrar el resultado en la GUI
+    lblResultado.config(text="La moneda es: " + resultado, bg='white')
+
+    # Mostrar la imagen correspondiente
+    image_path = "./assets/" + resultado + ".jpg"
+    img = Image.open(image_path)
+    img = img.resize((100, 100), Image.Resampling.LANCZOS)  # Ajustar tamaño de la imagen
+    img = ImageTk.PhotoImage(img)
+    panel.config(image=img)
+    panel.image = img  # Mantener referencia para evitar recolección por el recolector de basura
+
+# Ventana Principal
+ventaMain = Tk()
+ventaMain.geometry('500x500')
+ventaMain.configure(bg='white')
+ventaMain.title('RECONOCIMIENTO DE MONEDAS')
+
+lblTitulo = Label(ventaMain, text="Grabar caida moneda", bg='white')
+lblTitulo.pack(pady=10)
+
+# Cargar la imagen del botón y ajustar tamaño
+imagen_boton = Image.open("./assets/microred.png")
+imagen_boton = imagen_boton.resize((200, 200), Image.Resampling.LANCZOS)
+boton_imagen = ImageTk.PhotoImage(imagen_boton)
+
+# Crear el botón sin bordes
+boton = Button(ventaMain, image=boton_imagen, command=verificarSonido, bd=0, relief=FLAT, bg='white')
+boton.image = boton_imagen  # Mantener referencia a la imagen
+boton.pack(pady=20)
+
+lblResultado = Label(ventaMain, text="", bg='white')
+lblResultado.pack(pady=10)
+
+# Placeholder para la imagen
+panel = Label(ventaMain, bg='white')
+panel.pack(pady=20)
 
 def PaginaPrincipal():
     ventaMain.mainloop()
