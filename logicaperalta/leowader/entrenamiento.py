@@ -46,20 +46,20 @@ def construir_modelo(input_shape,loss='sparse_categorical_crossentropy',rate = 0
     modelo.add(tf.keras.layers.MaxPooling2D((3, 3), strides=(2, 2), padding='same'))
 
     # 2nd capa de conv
-    modelo.add(tf.keras.layers.Conv2D(64, (2, 2), activation='sigmoid',
+    modelo.add(tf.keras.layers.Conv2D(64, (2, 2), activation='relu',
                             kernel_regularizer=tf.keras.regularizers.l2(0.001)))
     modelo.add(tf.keras.layers.BatchNormalization())
     modelo.add(tf.keras.layers.MaxPooling2D((2, 2), strides=(2, 2), padding='same'))
 
     # 3nd capa de conv
-    modelo.add(tf.keras.layers.Conv2D(32, (2, 2), activation='linear',
+    modelo.add(tf.keras.layers.Conv2D(32, (2, 2), activation='relu',
                             kernel_regularizer=tf.keras.regularizers.l2(0.001)))
     modelo.add(tf.keras.layers.BatchNormalization())
     modelo.add(tf.keras.layers.MaxPooling2D((2, 2), strides=(2, 2), padding='same'))
     # Aplanar la salida y alimentarla en una capa densa
     modelo.add(tf.keras.layers.Flatten())
     modelo.add(tf.keras.layers.Dense(128, activation='relu'))
-    tf.keras.layers.Dropout(0.5)
+    tf.keras.layers.Dropout(0.4)
 
     # capa de salida softmax
     modelo.add(tf.keras.layers.Dense(5, activation='softmax'))
@@ -78,7 +78,7 @@ def construir_modelo(input_shape,loss='sparse_categorical_crossentropy',rate = 0
 
 def entrenamiento(modelo, epochs, batch_size, patience, X_train, y_train, X_validation, y_validation):
    
-    earlystop_callback = tf.keras.callbacks.EarlyStopping(monitor="accuracy", min_delta=0.001, patience=patience)
+    earlystop_callback = tf.keras.callbacks.EarlyStopping(monitor="val_accuracy", min_delta=0.001, patience=patience)
 
     # Modelo de entrenamiento
     modelo.fit(X_train, y_train, epochs=epochs, batch_size=batch_size, validation_data=(X_validation, y_validation),
