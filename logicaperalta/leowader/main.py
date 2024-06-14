@@ -5,7 +5,7 @@ from tkinter import *
 import pyaudio
 import wave
 import librosa
-RUTA_MODELO = "modelook.h5"
+RUTA_MODELO = "modelook4.h5"
 MUESTRAS = 22050  # Considera audios superiores a 1 segs
 
 class _Detectar_nota:
@@ -123,7 +123,7 @@ def verificarSonido():
     assert detectarNota is detectarNota1
 
     # Hacer una predicción
-    resultado = detectarNota.predecir("./Sonidos/200/Grabación (50).wav")
+    resultado = detectarNota.predecir("./Sonidos/100")
     print(resultado)
 
     lblResultado = Label(ventaMain, text="La moneda  es: " + resultado)

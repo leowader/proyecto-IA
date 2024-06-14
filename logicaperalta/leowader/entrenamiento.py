@@ -58,7 +58,7 @@ def construir_modelo(input_shape,loss='sparse_categorical_crossentropy',rate = 0
     modelo.add(tf.keras.layers.MaxPooling2D((2, 2), strides=(2, 2), padding='same'))
     # Aplanar la salida y alimentarla en una capa densa
     modelo.add(tf.keras.layers.Flatten())
-    modelo.add(tf.keras.layers.Dense(64, activation='relu'))
+    modelo.add(tf.keras.layers.Dense(128, activation='relu'))
     tf.keras.layers.Dropout(0.5)
 
     # capa de salida softmax
