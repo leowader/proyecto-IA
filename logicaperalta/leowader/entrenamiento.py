@@ -5,7 +5,7 @@ from sklearn.model_selection import train_test_split
 
 
 RUTA_DATASET = "./datasetudio.json"
-GUARDAR_MODELO = "entrenamiento.h5"
+GUARDAR_MODELO = "modelook3.h5"
 EPOCAS = 1000
 BATCH_SIZE = 32 # vaya dando una respuesta entre cada epoca
 CARPETAS = 20
@@ -52,14 +52,14 @@ def construir_modelo(input_shape,loss='sparse_categorical_crossentropy',rate = 0
     modelo.add(tf.keras.layers.MaxPooling2D((2, 2), strides=(2, 2), padding='same'))
 
     # 3nd capa de conv
-    modelo.add(tf.keras.layers.Conv2D(32, (2, 2), activation='linear',
+    modelo.add(tf.keras.layers.Conv2D(64, (2, 2), activation='linear',
                             kernel_regularizer=tf.keras.regularizers.l2(0.001)))
     modelo.add(tf.keras.layers.BatchNormalization())
     modelo.add(tf.keras.layers.MaxPooling2D((2, 2), strides=(2, 2), padding='same'))
     # Aplanar la salida y alimentarla en una capa densa
     modelo.add(tf.keras.layers.Flatten())
     modelo.add(tf.keras.layers.Dense(128, activation='relu'))
-    tf.keras.layers.Dropout(0.5)
+    tf.keras.layers.Dropout(0.3)
 
     # capa de salida softmax
     modelo.add(tf.keras.layers.Dense(3, activation='softmax'))

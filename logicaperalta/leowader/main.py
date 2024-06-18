@@ -8,7 +8,7 @@ import tensorflow as tf
 import numpy as np
 from PIL import Image, ImageTk
 
-RUTA_MODELO = "entrenamiento.h5"
+RUTA_MODELO = "modelook3.h5"
 MUESTRAS = 22050
 
 class _Detectar_nota:
@@ -32,7 +32,9 @@ class _Detectar_nota:
         return mfccs.T
 
 def cargar_audios(ruta_carpeta):
-    return [os.path.join(ruta_carpeta, archivo) for archivo in os.listdir(ruta_carpeta) if archivo.endswith('.wav')]
+    archivos = [archivo for archivo in os.listdir(ruta_carpeta) if archivo.endswith('.wav')]
+    rutas_completas = [os.path.join(ruta_carpeta, archivo) for archivo in archivos]
+    return archivos, rutas_completas
 
 def seleccionar_audio(ruta_audio):
     CHUNK = 1024
@@ -76,10 +78,12 @@ def mostrar_resultado(resultado):
     panel.image = img
 
 def cargar_carpeta(ruta_carpeta):
-    archivos = cargar_audios(ruta_carpeta)
+    archivos, rutas_completas = cargar_audios(ruta_carpeta)
     lista_audios.delete(0, END)  # Limpiar lista actual
     for archivo in archivos:
         lista_audios.insert(END, archivo)
+    global rutas_audios
+    rutas_audios = rutas_completas
 
 def cargar_carpeta_100():
     cargar_carpeta('./Sonidos/100')
@@ -91,10 +95,13 @@ def cargar_carpeta_500():
     cargar_carpeta('./Sonidos/500')
 
 def seleccionar_audio_seleccionado():
-    seleccionado = lista_audios.get(ACTIVE)
-    seleccionar_audio(seleccionado)
-    resultado = verificarSonido(seleccionado)
-    mostrar_resultado(resultado)
+    seleccionado = lista_audios.curselection()
+    if seleccionado:
+        index = seleccionado[0]
+        ruta_audio = rutas_audios[index]
+        seleccionar_audio(ruta_audio)
+        resultado = verificarSonido(ruta_audio)
+        mostrar_resultado(resultado)
 
 def grabar_audio():
     FORMAT = pyaudio.paInt16
@@ -137,10 +144,12 @@ def grabar_audio():
     mostrar_resultado(resultado)
 
 def reproducir_audio_seleccionado():
-    seleccionado = lista_audios.get(ACTIVE)
+    seleccionado = lista_audios.curselection()
     if seleccionado:
-        seleccionar_audio(seleccionado)
-        resultado = verificarSonido(seleccionado)
+        index = seleccionado[0]
+        ruta_audio = rutas_audios[index]
+        seleccionar_audio(ruta_audio)
+        resultado = verificarSonido(ruta_audio)
         mostrar_resultado(resultado)
     else:
         print("No se ha seleccionado ningún archivo de audio.")
@@ -151,11 +160,14 @@ ventaMain.geometry('800x500')
 ventaMain.configure(bg='white')
 ventaMain.title('RECONOCIMIENTO DE MONEDAS')
 
+# Configuración de fuente por defecto
+ventaMain.option_add("*Font", "Arial 12")
+
 # Panel izquierdo con botones
 panel_izquierdo = Frame(ventaMain, bg='white')
 panel_izquierdo.pack(side=LEFT, padx=20, pady=20, fill=Y)
 
-lblTitulo = Label(panel_izquierdo, text="Seleccionar audio y reconocer moneda", bg='white', font=('Helvetica', 16))
+lblTitulo = Label(panel_izquierdo, text="Seleccionar audio y reconocer moneda", bg='white', font=('Arial', 16))
 lblTitulo.pack(pady=10)
 
 imagen_boton = Image.open("./assets/microred.png")
@@ -184,7 +196,7 @@ panel_derecho.pack(side=LEFT, padx=20, pady=20, fill=BOTH, expand=True)
 lista_audios = Listbox(panel_derecho, selectmode=SINGLE, width=100, height=20)
 lista_audios.pack(pady=20, padx=20, side=TOP, fill=BOTH, expand=True)
 
-lblResultado = Label(panel_derecho, text="", bg='white', font=('Helvetica', 16))
+lblResultado = Label(panel_derecho, text="", bg='white', font=('Arial', 16))
 lblResultado.pack(pady=10)
 
 panel = Label(panel_derecho, bg='white')
@@ -200,4 +212,5 @@ def PaginaPrincipal():
     ventaMain.mainloop()
 
 if __name__ == "__main__":
+    rutas_audios = []  # Almacenar rutas completas de audios cargados
     PaginaPrincipal()
